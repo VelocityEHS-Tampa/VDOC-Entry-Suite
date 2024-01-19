@@ -36,4 +36,16 @@
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
 </body>
+
+<script>
+    $(document).ready(function () {
+    })
+
+    function FillCompanyInfo(SelectedCompany) {
+        const CoName = SelectedCompany.split("-")
+        document.getElementById("CompanyName").value = CoName[0];
+        document.getElementById("CompanyMIS").value = CoName[1];
+    }
+</script>
+
 </html>

@@ -10,20 +10,13 @@ namespace vdoc.chemtel.net.Controllers
     {
         public ActionResult Index()
         {
-            return View();
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
+            string DEFolder = @"\\chem-fs1.ers.local\Document_DB\Operators\mpepitone";
+            List<string> Companies = new List<string>();
+            foreach (string d in System.IO.Directory.GetDirectories(DEFolder))
+            {
+                Companies.Add(d.Split('\\')[6]); //Splitting the UNC path to get the company name at the end.
+            }
+            ViewBag.Companies = Companies;
             return View();
         }
     }

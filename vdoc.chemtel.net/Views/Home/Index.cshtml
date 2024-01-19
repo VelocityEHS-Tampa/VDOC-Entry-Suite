@@ -1,17 +1,19 @@
 ﻿@{
     ViewBag.Title = "Home Page";
+    List<string> Companies = new List<string>();
+    Companies = ViewBag.Companies;
 }
 <br />
 <div class="row">
     <div class="col-md-5">
         <h4 style="text-align:center;">Entry Fields</h4>
         <span>Companies</span>
-        <select name="CompanySelect" id="CompanySelect" style="width:75%;">
-            <option value="Company1">Company 1</option>
-            <option value="Company2">Company 2</option>
-            <option value="Company3">Company 3</option>
-            <option value="Company4">Company 4</option>
-            <option value="Company5">Company 5</option>
+        <select name="CompanySelect" id="CompanySelect" style="width:75%;" onchange="FillCompanyInfo(this.value)">
+            <option value="">--- Select Company ---</option>
+            @foreach (string c in Companies)
+            {
+                <option value="@c">@c</option>
+            }
         </select>
         <br />
         <br />
@@ -29,9 +31,9 @@
         <br />
         <div style="border:1px solid blue;padding:5px;">
             <p>Company Information</p>
-            <span>Company</span>&nbsp;&nbsp;<input type="text" name="CompanyName" style="width:100%; border-radius:5px;" /> <br /><br />
+            <span>Company</span>&nbsp;&nbsp;<input type="text" name="CompanyName" id="CompanyName" style="width:100%; border-radius:5px;" /> <br /><br />
             <span>Filename</span>&nbsp;&nbsp;<input type="text" name="Filename" style="width: 100%; border-radius: 5px;" /><br /><br />
-            <span>MIS</span>&nbsp;&nbsp;<input type="text" name="CompanyMIS" style="width: 100%; border-radius: 5px;" /><br /><br />
+            <span>MIS</span>&nbsp;&nbsp;<input type="text" name="CompanyMIS" id="CompanyMIS" style="width: 100%; border-radius: 5px;" /><br /><br />
         </div>
 
         <br />
