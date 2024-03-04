@@ -88,12 +88,13 @@
                 type: 'GET',
                 success: function (data) {
                     //var CompanyFiles = data.split(',');
-                    if (data.FileList != "" && data.FileList != "null") {
+                    if (data.FileList != "" && data.FileList != null) {
                         document.getElementById("PdfDisplay").src = "https://sds.chemtel.net/DocDB/mpepitone/" + document.getElementById("CompanySelect").value + "/" + data.FileList;
                         document.getElementById("OldFileName").value = data.FileList;
                     } else {
-                        alert("THERE ARE NO FILES LEFT IN THIS FOLDER");
                         document.getElementById("PdfDisplay").src = "";
+                        alert("THERE ARE NO FILES LEFT IN THIS FOLDER, PLEASE REMOVE THE FOLDER IF IT IS COMPLETED.");
+                        location.href = "";
                     }
                     //https://sds.chemtel.net/DocDB/mpepitone/1Test-0000000/3M No Cleanup Rocker Gard Nr 8949.pdf
                 },
@@ -162,7 +163,6 @@
             });
         }
         function SubmitForm() { //Submit Form via javascript to check for duplicate files first
-            var HasDuplicate = "";
             $.ajax({
                 url: '/Home/CheckForDuplicates/',
                 data: { Filename: document.getElementById("Filename").value, CompanySelected: document.getElementById("SelectedCompany").value },

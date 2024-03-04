@@ -101,7 +101,7 @@ namespace vdoc.chemtel.net.Controllers
             }
             else
             {
-                FileList = "THERE ARE NO MORE FILES LEFT IN THIS FOLDER";
+                FileList = "";
             }
             return Json(new { FileList = FileList }, JsonRequestBehavior.AllowGet);
         }
