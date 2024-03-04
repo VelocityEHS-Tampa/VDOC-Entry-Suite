@@ -25,7 +25,7 @@
             <input type="button" value="Go" class="form-control" style="width:50%; margin:0 auto;" onclick="GetFiles()" />
         }
         <br />
-        @using (Html.BeginForm("SubmitNewFile", "Home", FormMethod.Post))
+        @using (Html.BeginForm("SubmitNewFile", "Home", FormMethod.Post, new { @id = "SubmitNewVdoc"}))
         {
             <input type="hidden" name="SelectedCompany" id="SelectedCompany" value=""/>
             <input type="hidden" name="OldFileName" id="OldFileName" value="" />
@@ -63,7 +63,7 @@
             <br />
             <br />
 
-            <input type="submit" value="Ok" style="width:25%;" onclick="return SubmitForm()"/>
+            <input type="button" value="Ok" style="width:25%;" onclick="return SubmitForm()"/>
             <input type="button" value="Next" style="width:25%;" onclick="GetNextFile()" />
         }
         <br />
@@ -168,23 +168,24 @@
                 data: { Filename: document.getElementById("Filename").value, CompanySelected: document.getElementById("SelectedCompany").value },
                 type: 'GET',
                 success: function (data) {
-                    HasDuplicate = data.HasDuplicate;
-                    alert(data.responseText);
+                    HasDuplicateMessage(data.HasDuplicate);
                 },
                 error: function (data) {
                     alert("ERROR!");
                 }
             });
 
-            if (HasDuplicate == "1") {
+        }
+        function HasDuplicateMessage(DuplicateBit) {
+            if (DuplicateBit == "1") {
                 var submit = confirm("There is another with the same file name, do you want to overwrite the existing file?");
                 if (submit) { //If overwrite is good to go push to review.
-                    return true;
+                    document.getElementById("SubmitNewVdoc").submit();
                 } else {
                     return false;
                 }
             } else {
-                return true;
+                document.getElementById("SubmitNewVdoc").submit();
             }
         }
     </script>

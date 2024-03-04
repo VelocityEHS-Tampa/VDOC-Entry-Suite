@@ -148,6 +148,7 @@ namespace vdoc.chemtel.net.Controllers
                 System.IO.File.Copy(src, dest, true);
                 System.IO.File.Delete(src);
                 AddRecord(constring, m);
+                GetFiles(fc["SelectedCompany"].ToString(), 0);
             }
             catch (Exception ex)
             {
