@@ -93,6 +93,7 @@ namespace vdoc.chemtel.net.Controllers
         [HttpGet]
         public JsonResult GetFiles(string SelectedCompany, int FileIndex) //Gets the selected company's files to be processed
         {
+            Session.Add("CompanySelected", SelectedCompany);
             string FileList = "";
             if (Directory.GetFiles(rootpath + "\\" + SelectedCompany).Length != 0)
             {
@@ -137,18 +138,17 @@ namespace vdoc.chemtel.net.Controllers
         {
             try
             {
-                string reviewpath = @"\\chem-fs1.ers.local\Document_DB\Operators\Review\" + fc["SelectedCompany"].ToString() + @"\"; //Sets the destination folder
+                string reviewpath = @"\\chem-fs1.ers.local\Document_DB\Operators\Review\" + Session["CompanySelected"].ToString() + @"\"; //Sets the destination folder
                 MSDSReview m = new MSDSReview();
                 m = GetData(fc); //Gets the data from the form
                 if (!Directory.Exists(reviewpath)) { //Determines if the current company has a subfolder in the Review folder
                     Directory.CreateDirectory(reviewpath); //If not, it's created
                 }
-                string src = rootpath + fc["SelectedCompany"].ToString() + @"\" + fc["OldFileName"].ToString(); //Sets the source path
+                string src = rootpath + Session["CompanySelected"].ToString() + @"\" + fc["OldFileName"].ToString(); //Sets the source path
                 string dest = reviewpath + fc["Filename"].ToString(); //Sets the destination path
                 System.IO.File.Copy(src, dest, true);
                 System.IO.File.Delete(src);
                 AddRecord(constring, m);
-                GetFiles(fc["SelectedCompany"].ToString(), 0);
             }
             catch (Exception ex)
             {
