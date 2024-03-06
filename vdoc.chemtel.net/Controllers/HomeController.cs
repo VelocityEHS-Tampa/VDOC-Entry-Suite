@@ -12,10 +12,141 @@ namespace vdoc.chemtel.net.Controllers
     public class HomeController : Controller
     {
         string constring = Properties.Settings.Default.Connection; //Connection string to the database
+        string Userconstring = Properties.Settings.Default.UserConnection; //Connection string to the database
         string username = System.Environment.UserName;
         string rootpath = @"\\chem-fs1.ers.local\Document_DB\Operators\" + System.Environment.UserName + @"\"; //Sets the path to the operators folder
+
+        #region Login Functions
+        public ActionResult Login(FormCollection fc)
+        {
+
+            string username = fc["username"].ToString();
+            string password = fc["password"].ToString();
+            //Throw error if missing field.
+            if (username == "" || password == "")
+            {
+                ViewBag.ErrorMessage = "Invalid Username/Password combination";
+                return View();
+            }
+
+            //Start validation process
+            string LoginValidated = ValidatePass(username, password);
+
+            if (LoginValidated == "Yes")
+            {
+                Session.Add("SessionStartTime", DateTime.Now);
+                GetAcctInfo(username);
+                if (password == "Password1" || Int32.Parse(Session["DaysBetween"].ToString()) >= 90)
+                {
+                    Session.Add("Username", username);
+                    return View("ResetPassword");
+                }
+                else
+                {
+                    ViewBag.ErrorMessage = "Successful Login!";
+                    return RedirectToAction("Index");
+                }
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "Invalid Username/Password combination";
+                return View();
+            }
+        }
+        public ActionResult ResetPassword()
+        {
+            return View();
+        }
+        public ActionResult PasswordChangeResults(FormCollection fc)
+        {
+            string username = Session["username"].ToString();
+            string password = fc["NewPassword"].ToString();
+            string SqlCmd = "UPDATE CRMWebU SET Password = @p, LastPassChange = @lpc WHERE Username = @un";
+
+            string EncPass = PassEncrypt.EncodePassword(password);
+
+            using (SqlConnection con = new SqlConnection(Userconstring))
+            {
+                using (SqlCommand cmd = new SqlCommand(SqlCmd, con))
+                {
+                    con.Open();
+                    cmd.Parameters.AddWithValue("@p", EncPass);
+                    cmd.Parameters.AddWithValue("@un", username);
+                    cmd.Parameters.AddWithValue("@lpc", DateTime.Now.ToShortDateString());
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            GetAcctInfo(username);
+            return RedirectToAction("Index");
+        }
+        public ActionResult Logout()
+        {
+            Session["Username"] = null;
+            Session["FullName"] = null;
+            Session["AccountType"] = null;
+            return RedirectToAction("Index");
+        }
+        private string ValidatePass(string username, string password)
+        {
+            string Validated = "No";
+            string DBPass = "";
+            string SqlCmd = "SELECT Password FROM CRMWebU WHERE username = @username";
+
+            using (SqlConnection con = new SqlConnection(Userconstring))
+            {
+                using (SqlCommand cmd = new SqlCommand(SqlCmd, con))
+                {
+                    con.Open();
+                    cmd.Parameters.AddWithValue("@username", username);
+                    DBPass = cmd.ExecuteScalar().ToString();
+                }
+            }
+
+            string EncPass = PassEncrypt.EncodePassword(password);
+
+            if (EncPass == DBPass)
+            {
+                Validated = "Yes";
+            }
+
+            return Validated;
+        }
+        private void GetAcctInfo(string username)
+        {
+            string SqlCmd = "Select * FROM CRMWebU WHERE Username = @username";
+            using (SqlConnection con = new SqlConnection(Userconstring))
+            {
+                using (SqlCommand cmd = new SqlCommand(SqlCmd, con))
+                {
+                    con.Open();
+                    cmd.Parameters.AddWithValue("@username", username);
+                    SqlDataReader sdr = cmd.ExecuteReader();
+                    while (sdr.Read())
+                    {
+                        Session.Add("Username", sdr["Username"].ToString());
+                        Session.Add("FullName", sdr["Name"].ToString());
+                        Session.Add("AccountType", sdr["UserType"].ToString());
+                        Session.Add("LastPassChange", sdr["LastPassChange"].ToString());
+                        //Get how many days it has been since the last password change.
+                        TimeSpan ts = DateTime.Now - DateTime.Parse(sdr["LastPassChange"].ToString());
+                        Session.Add("DaysBetween", Math.Round(ts.TotalDays));
+                    }
+                }
+            }
+        }
+        #endregion
+
+
+
+
         public ActionResult Index()
         {
+            //if (Session["Username"] == null || Session["Username"].ToString() == "")
+            //{
+            //    ViewBag.ErrorMessage = "You must login before proceeding!";
+            //    return RedirectToAction("Index", "Home", new { e = "You must login before proceeding!" });
+            //}
+
             //Get Companies within Users folder
             List<string> Companies = new List<string>();
             foreach (string d in Directory.GetDirectories(rootpath))
@@ -163,6 +294,8 @@ namespace vdoc.chemtel.net.Controllers
                 string user = System.Environment.UserName;
                 log.WriteLine("Date: " + DateTime.Now.ToShortDateString() + "\n" + "Time: " + DateTime.Now.ToShortTimeString() + "\n" + "User: " + user + "\n" + "Error Message: " + ex.Message + "\n" + "File: " + pfile + "\n" + "Method: " + mod + "\n\n\n");
                 log.Close();
+                return RedirectToAction("Error", "Home", new { ErrorMessage = ex.Message });
+
                 //string msg = "Check the log file!";
                 //string subject = "Vdoc Error";
                 //to.Add("mpepitone@chemtelinc.com");
@@ -172,7 +305,7 @@ namespace vdoc.chemtel.net.Controllers
                 //message.Body = msg;
                 //smtp.Send(message);
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new {FileSubmitted = "Success" });
         }
         [HttpGet]
         public JsonResult FormatFilename(string Manufacturer, string ProductName, string ProductNumber, string Language, string Date)

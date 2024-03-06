@@ -4,84 +4,95 @@
     Companies = ViewBag.Companies;
     string RepeatCompany = "";
 }
-@if (Session["CompanySelected"] != null)
+@if (Session["Username"] == null && Session["FullName"] == null && Session["UserType"] == null)
 {
-    RepeatCompany = @Session["CompanySelected"].ToString();
+    Html.RenderPartial("Login");
 }
-<br />
-<div class="row">
-    <div class="col-md-5">
-        <h4 style="text-align:center;">Data Entry Fields</h4>
-        @using (Html.BeginForm("GetFiles", "Home", FormMethod.Post))
-        {
-            <span>Companies</span>
-            <select name="CompanySelect" id="CompanySelect" style="width:75%;" onchange="FillCompanyInfo(this.value)">
-                <option value="">--- Select Company ---</option>
-                @foreach (string c in Companies)
-                {
-                    if (Session["CompanySelected"] != null && Session["CompanySelected"].ToString() == c) // Allows for company to remain selected after submitting new file.
+else
+{
+    if (Session["CompanySelected"] != null)
+    {
+        RepeatCompany = @Session["CompanySelected"].ToString();
+    }
+    <br />
+    if (Request.QueryString["FileSubmitted"] != null && Request.QueryString["FileSubmitted"] == "Success")
+    {
+        <span class="alert-success form-control" style="text-align:center;">Your file has been succesfully submitted!</span>
+        <br />
+    }
+    <div class="row">
+        <div class="col-md-5">
+            <h4 style="text-align:center;">Data Entry Fields</h4>
+            @using (Html.BeginForm("GetFiles", "Home", FormMethod.Post))
+            {
+                <span>Companies</span>
+                <select name="CompanySelect" id="CompanySelect" style="width:75%;" onchange="FillCompanyInfo(this.value)">
+                    <option value="">--- Select Company ---</option>
+                    @foreach (string c in Companies)
                     {
-                        <option value="@c" selected="">@c</option>
+                        if (Session["CompanySelected"] != null && Session["CompanySelected"].ToString() == c) // Allows for company to remain selected after submitting new file.
+                        {
+                            <option value="@c" selected="">@c</option>
+                        }
+                        else
+                        {
+                            <option value="@c">@c</option>
+                        }
                     }
-                    else
-                    {
-                        <option value="@c">@c</option>
-                    }
-                }
-            </select>
+                </select>
+                <br />
+                <br />
+                <input type="button" value="Go" class="form-control" style="width:50%; margin:0 auto;" onclick="GetFiles()" />
+            }
             <br />
-            <br />
-            <input type="button" value="Go" class="form-control" style="width:50%; margin:0 auto;" onclick="GetFiles()" />
-        }
-        <br />
-        @using (Html.BeginForm("SubmitNewFile", "Home", FormMethod.Post, new { @id = "SubmitNewVdoc" }))
-        {
-            <input type="hidden" name="SelectedCompany" id="SelectedCompany" value="" />
-            <input type="hidden" name="OldFileName" id="OldFileName" value="" />
-            <br />
-            <div style="text-align:center;">
-                <p style="text-align:left;">Priority</p>
-                <select size="10" style="width: 75%;"></select>
-            </div>
-            <br />
-            <br />
-            <input type="button" value="Refresh" class="form-control" style="width:50%; margin:0 auto;" />
-            <br />
-            <br />
-            <div style="border:1px solid blue;padding:5px;">
-                <p>Company Information</p>
-                <span>Company</span>&nbsp;&nbsp;<input type="text" name="CompanyName" id="CompanyName" style="width:100%; border-radius:5px;" oncopy="return false" /> <br /><br />
-                <span>Filename</span>&nbsp;&nbsp;<input type="text" id="Filename" name="Filename" style="width: 100%; border-radius: 5px;" maxlength="256" oncopy="return false" /><br /><br />
-                <span>MIS</span>&nbsp;&nbsp;<input type="text" name="CompanyMIS" id="CompanyMIS" style="width: 100%; border-radius: 5px;" oncopy="return false" /><br /><br />
-            </div>
+            @using (Html.BeginForm("SubmitNewFile", "Home", FormMethod.Post, new { @id = "SubmitNewVdoc" }))
+            {
+                <input type="hidden" name="SelectedCompany" id="SelectedCompany" value="" />
+                <input type="hidden" name="OldFileName" id="OldFileName" value="" />
+                <br />
+                <div style="text-align:center;">
+                    <p style="text-align:left;">Priority</p>
+                    <select size="10" style="width: 75%;"></select>
+                </div>
+                <br />
+                <br />
+                <input type="button" value="Refresh" class="form-control" style="width:50%; margin:0 auto;" />
+                <br />
+                <br />
+                <div style="border:1px solid black;padding:5px;">
+                    <p>Company Information</p>
+                    <span>Company</span>&nbsp;&nbsp;<input type="text" name="CompanyName" id="CompanyName" style="width:100%; border-radius:5px;" oncopy="return false" /> <br /><br />
+                    <span>Filename</span>&nbsp;&nbsp;<input type="text" id="Filename" name="Filename" style="width: 100%; border-radius: 5px;" maxlength="256" oncopy="return false" readonly="" /><br /><br />
+                    <span>MIS</span>&nbsp;&nbsp;<input type="text" name="CompanyMIS" id="CompanyMIS" style="width: 100%; border-radius: 5px;" oncopy="return false" /><br /><br />
+                </div>
 
+                <br />
+                <br />
+
+                <div style="border:1px solid black; padding: 5px;">
+                    <span>Manufacturer</span>&nbsp;&nbsp;<input type="text" id="Manufacturer" name="Manufacturer" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" /><br /><br />
+                    <span>Product Name</span>&nbsp;&nbsp;<input type="text" id="ProductName" name="ProductName" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" /><br /><br />
+                    <span>Product Number</span>&nbsp;&nbsp;<input type="text" id="ProductNumber" name="ProductNumber" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" /><br /><br />
+                    <span>Date</span>&nbsp;&nbsp;<input type="text" id="Date" name="Date" style="width: 100%; border-radius: 5px;" onblur="FormatDate(this.value), FormatFileName()" onpaste="return false" /><br /><br />
+                    <span>Language</span>&nbsp;&nbsp;<input type="text" id="Language" name="Language" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" /><br /><br />
+                    <span>Location</span>&nbsp;&nbsp;<input type="text" id="Location" name="Location" style="width: 100%; border-radius: 5px;" onpaste="return false" /><br /><br />
+                    <span>Department</span>&nbsp;&nbsp;<input type="text" id="Department" name="Department" style="width: 100%; border-radius: 5px;" onpaste="return false" /><br /><br />
+                    <span>Common Name</span>&nbsp;&nbsp;<input type="text" id="CommonName" name="CommonName" style="width: 100%; border-radius: 5px;" onpaste="return false" /><br />
+                </div>
+
+                <br />
+                <br />
+
+                <input type="button" value="Ok" style="width:25%;" onclick="return SubmitForm()" />
+                <input type="button" value="Next" style="width:25%;" onclick="GetNextFile()" />
+            }
             <br />
             <br />
+        </div>
 
-            <div style="border:1px solid blue; padding: 5px;">
-                <span>Manufacturer</span>&nbsp;&nbsp;<input type="text" id="Manufacturer" name="Manufacturer" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" /><br />
-                <span>Product Name</span>&nbsp;&nbsp;<input type="text" id="ProductName" name="ProductName" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" /><br />
-                <span>Product Number</span>&nbsp;&nbsp;<input type="text" id="ProductNumber" name="ProductNumber" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" /><br />
-                <span>Date</span>&nbsp;&nbsp;<input type="text" id="Date" name="Date" style="width: 100%; border-radius: 5px;" onblur="FormatDate(this.value), FormatFileName()" onpaste="return false" /><br />
-                <span>Language</span>&nbsp;&nbsp;<input type="text" id="Language" name="Language" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" /><br />
-                <span>Location</span>&nbsp;&nbsp;<input type="text" id="Location" name="Location" style="width: 100%; border-radius: 5px;" onpaste="return false" /><br />
-                <span>Department</span>&nbsp;&nbsp;<input type="text" id="Department" name="Department" style="width: 100%; border-radius: 5px;" onpaste="return false" /><br />
-                <span>Common Name</span>&nbsp;&nbsp;<input type="text" id="CommonName" name="CommonName" style="width: 100%; border-radius: 5px;" onpaste="return false" /><br />
-            </div>
-
-            <br />
-            <br />
-
-            <input type="button" value="Ok" style="width:25%;" onclick="return SubmitForm()" />
-            <input type="button" value="Next" style="width:25%;" onclick="GetNextFile()" />
-        }
-        <br />
-        <br />
-    </div>
-
-    @* Add javascript here due to IFrame stopping the loading for the regular page.  *@
-    <script src="/Scripts/jquery-3.4.1.js"></script>
-    <script>
+        @* Add javascript here due to IFrame stopping the loading for the regular page.  *@
+        <script src="/Scripts/jquery-3.4.1.js"></script>
+        <script>
         $(document).ready(function () {
             if ("@RepeatCompany" != "") { //Get files again when page reloads.
                 FillCompanyInfo("@RepeatCompany"); //Fills Manufacturer and MIS with still selected company
@@ -201,13 +212,14 @@
                 document.getElementById("SubmitNewVdoc").submit();
             }
         }
-    </script>
+        </script>
 
-    <div class="col-md-7" style="text-align:center;">
-        <div id="PDFHolder" name="PDFHolder" style="position:fixed; width:50%;">
-            <h4 style="text-align:center; margin: 0 auto;">MSDS Document</h4>
-            <br />
-            <iframe id="PdfDisplay" name="PdfDisplay" src="" type="application/pdf" style="width:100%; height:1000px;" />
+        <div class="col-md-7" style="text-align:center;">
+            <div id="PDFHolder" name="PDFHolder" style="position:fixed; width:50%;">
+                <h4 style="text-align:center; margin: 0 auto;">MSDS Document</h4>
+                <br />
+                <iframe id="PdfDisplay" name="PdfDisplay" src="" type="application/pdf" style="width:100%; height:1000px;" />
+            </div>
         </div>
     </div>
-</div>`
+}

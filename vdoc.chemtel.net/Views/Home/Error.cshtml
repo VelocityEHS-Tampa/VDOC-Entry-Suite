@@ -1,0 +1,18 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Error</title>
+</head>
+<body>
+    <br />
+    <h2>An error occurred while processing your request.</h2>
+    <h5>A log has been written and IT has been notified.</h5>
+    @if (Request.QueryString["ErrorMessage"].ToString() != null && Request.QueryString["ErrorMessage"].ToString() != "")
+    {
+        <span class="alert-danger">
+            @Request.QueryString["ErrorMessage"].ToString()
+        </span>
+    }
+</body>
+</html>

@@ -33,5 +33,16 @@ namespace vdoc.chemtel.net.Properties {
                 return ((string)(this["Connection"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=chemdb1.c8ujbgtllu2u.us-east-2.rds.amazonaws.com;Initial Catalog=chem" +
+            "reporter;Persist Security Info=True;User ID=admin;Password=LrtcXcIvlnNlWNDDeArq")]
+        public string UserConnection {
+            get {
+                return ((string)(this["UserConnection"]));
+            }
+        }
     }
 }
