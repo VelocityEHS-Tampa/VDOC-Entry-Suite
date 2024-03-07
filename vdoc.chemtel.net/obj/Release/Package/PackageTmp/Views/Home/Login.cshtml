@@ -1,0 +1,25 @@
+﻿@{
+    string ErrorMessage = ViewBag.ErrorMessage;
+}
+
+
+@using (Html.BeginForm("Login", "Home", FormMethod.Post))
+{
+    <div style="width:25%; margin:0 auto;">
+        @if (Request.QueryString["e"] != null && Request.QueryString["e"] != "")
+        {
+            <span class="required-field">@Request.QueryString["e"].ToString()</span><br />
+        }
+        @if (ErrorMessage != "")
+        {
+            <span class="required-field">@ErrorMessage</span><br />
+        }
+        <input type="text" name="username" id="username" class="form-control" required="" placeholder="Username *" /><br />
+        <input type="password" name="password" id="password" class="form-control" required="" placeholder="Password *" /><br />
+        <input type="submit" name="Login" id="Login" value="Login" class="form-control" />
+        <br /><br />
+        * - Required Field(s)
+    </div>
+}
+
+

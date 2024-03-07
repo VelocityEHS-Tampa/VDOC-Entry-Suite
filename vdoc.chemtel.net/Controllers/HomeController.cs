@@ -13,7 +13,6 @@ namespace vdoc.chemtel.net.Controllers
     {
         string constring = Properties.Settings.Default.Connection; //Connection string to the database
         string Userconstring = Properties.Settings.Default.UserConnection; //Connection string to the database
-        string username = System.Environment.UserName;
         string rootpath = @"\\chem-fs1.ers.local\Document_DB\Operators\" + System.Environment.UserName + @"\"; //Sets the path to the operators folder
 
         #region Login Functions
@@ -159,7 +158,6 @@ namespace vdoc.chemtel.net.Controllers
             List<string> lang = new List<string>();
             lang = GetLanguages(); //Gets the list of languages for thelanguage combobox
             ViewBag.Languages = lang;
-            ViewBag.Username = username;
             return View();
         }
 
@@ -375,7 +373,7 @@ namespace vdoc.chemtel.net.Controllers
             m.Location = fc["Location"].ToString();
             m.Department = fc["Department"].ToString();
             m.Common_Name = fc["CommonName"].ToString();
-            m.Username = username;
+            m.Username = Session["username"].ToString();
             m.Date_Entered = DateTime.Now;
             return m;
         }
