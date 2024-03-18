@@ -72,10 +72,10 @@ else
                 <br />
 
                 <div style="border: 5px solid #00b6de; padding: 5px; border-radius: 5px; ">
-                    <span>Manufacturer</span>&nbsp;&nbsp;<input type="text" id="Manufacturer" name="Manufacturer" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" /><br /><br />
-                    <span>Product Name</span>&nbsp;&nbsp;<input type="text" id="ProductName" name="ProductName" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" /><br /><br />
-                    <span>Product Number</span>&nbsp;&nbsp;<input type="text" id="ProductNumber" name="ProductNumber" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" value="Unknown" /><br /><br />
-                    <span>Date</span>&nbsp;&nbsp;<input type="text" id="Date" name="Date" style="width: 100%; border-radius: 5px;" onblur="FormatDate(this.value), FormatFileName()" onpaste="return false" /><br /><br />
+                    <span>Manufacturer</span>&nbsp;&nbsp;<input type="text" id="Manufacturer" name="Manufacturer" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" autocomplete="off" /><br /><br />
+                    <span>Product Name</span>&nbsp;&nbsp;<input type="text" id="ProductName" name="ProductName" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" autocomplete="off"/><br /><br />
+                    <span>Product Number</span>&nbsp;&nbsp;<input type="text" id="ProductNumber" name="ProductNumber" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" value="Unknown" autocomplete="off"/><br /><br />
+                    <span>Date</span>&nbsp;&nbsp;<input type="text" id="Date" name="Date" style="width: 100%; border-radius: 5px;" onblur="FormatDate(this.value), FormatFileName()" onpaste="return false" autocomplete="off"/><br /><br />
                     <span>Language</span>&nbsp;&nbsp;
                     <select id="Language" name="Language" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()">
                         <option value="">--- Select a Language ---</option>
@@ -85,8 +85,8 @@ else
                         }
                     </select>
                     <br /><br />
-                    <span>Location</span>&nbsp;&nbsp;<input type="text" id="Location" name="Location" style="width: 100%; border-radius: 5px;" onpaste="return false" /><br /><br />
-                    <span>Department</span>&nbsp;&nbsp;<input type="text" id="Department" name="Department" style="width: 100%; border-radius: 5px;" onpaste="return false" /><br /><br />
+                    <span>Location</span>&nbsp;&nbsp;<input type="text" id="Location" name="Location" style="width: 100%; border-radius: 5px;" onpaste="return false" autocomplete="off"/><br /><br />
+                    <span>Department</span>&nbsp;&nbsp;<input type="text" id="Department" name="Department" style="width: 100%; border-radius: 5px;" onpaste="return false" autocomplete="off"/><br /><br />
                 </div>
 
                 <br />
