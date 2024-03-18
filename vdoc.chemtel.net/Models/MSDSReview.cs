@@ -12,7 +12,7 @@ namespace vdoc.chemtel.net.Models
         #region Private Fields
 
         private int _id;
-        private string _filename, _company, _productname, _commonname, _manufacturer, _productnumber, _date, _mis, _location, _dept, _username, _lastmodified, _language;
+        private string _filename, _company, _productname, _manufacturer, _productnumber, _date, _mis, _location, _dept, _username, _lastmodified, _language;
         private DateTime _dateentered;
 
         #endregion
@@ -53,12 +53,6 @@ namespace vdoc.chemtel.net.Models
         {
             get { return _productname; }
             set { _productname = value; }
-        }
-
-        public string Common_Name
-        {
-            get { return _commonname; }
-            set { _commonname = value; }
         }
 
         public string Manufacturer
@@ -126,7 +120,6 @@ namespace vdoc.chemtel.net.Models
             _filename = "";
             _company = "";
             _productname = "";
-            _commonname = "";
             _manufacturer = "";
             _productnumber = "";
             _date = "";

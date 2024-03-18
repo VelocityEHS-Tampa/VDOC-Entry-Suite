@@ -1,11 +1,19 @@
-﻿using System;
+﻿using SendGrid.Helpers.Mail;
+using SendGrid;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using vdoc.chemtel.net.Models;
+using System.Data;
+using System.Globalization;
+using System.Net;
+using System.Net.Mail;
 
 namespace vdoc.chemtel.net.Controllers
 {
@@ -13,7 +21,6 @@ namespace vdoc.chemtel.net.Controllers
     {
         string constring = Properties.Settings.Default.Connection; //Connection string to the database
         string Userconstring = Properties.Settings.Default.UserConnection; //Connection string to the database
-        string rootpath = @"\\chem-fs1.ers.local\Document_DB\Operators\" + System.Environment.UserName + @"\"; //Sets the path to the operators folder
 
         #region Login Functions
         public ActionResult Login(FormCollection fc)
@@ -37,6 +44,10 @@ namespace vdoc.chemtel.net.Controllers
                 GetAcctInfo(username);
                 if (password == "Password1" || Int32.Parse(Session["DaysBetween"].ToString()) >= 90)
                 {
+                    if (username == "ctaylor") //correct users username in order to access the Operator folder.
+                    {
+                        username = "cataylor";
+                    }
                     Session.Add("Username", username);
                     return View("ResetPassword");
                 }
@@ -136,80 +147,42 @@ namespace vdoc.chemtel.net.Controllers
         #endregion
 
 
-
-
         public ActionResult Index()
         {
-            //if (Session["Username"] == null || Session["Username"].ToString() == "")
-            //{
-            //    ViewBag.ErrorMessage = "You must login before proceeding!";
-            //    return RedirectToAction("Index", "Home", new { e = "You must login before proceeding!" });
-            //}
-
-            //Get Companies within Users folder
-            List<string> Companies = new List<string>();
-            foreach (string d in Directory.GetDirectories(rootpath))
+            if (Session["Username"] == null || Session["Username"].ToString() == "")
             {
-                Companies.Add(d.Split('\\')[6]); //Splitting the UNC path to get the company name at the end.
-            }
-            ViewBag.Companies = Companies;
+            } else
+            {
+                //Get Companies within Users folder
+                string rootpath = @"\\chem-fs1.ers.local\Document_DB\Operators\" + Session["username"].ToString() + @"\"; //Sets the path to the operators folder
+                List<string> Companies = new List<string>();
+                foreach (string d in Directory.GetDirectories(rootpath))
+                {
+                    Companies.Add(d.Split('\\')[6]); //Splitting the UNC path to get the company name at the end.
+                }
+                ViewBag.Companies = Companies;
             
-            //Get SDS Languages
-            List<string> lang = new List<string>();
-            lang = GetLanguages(); //Gets the list of languages for thelanguage combobox
-            ViewBag.Languages = lang;
+                //Get SDS Languages
+                List<string> lang = new List<string>();
+                lang = GetLanguages(); //Gets the list of languages for thelanguage combobox
+                ViewBag.Languages = lang;
+            }
             return View();
         }
 
         private void GetFolders()
         {
-            //try
-            //{
-                string[] files = Directory.GetDirectories(rootpath);
-                List<string> cbcompanies = new List<string>();
-                if (files.Length > 0)
+            string rootpath = @"\\chem-fs1.ers.local\Document_DB\Operators\" + Session["username"].ToString() + @"\"; //Sets the path to the operators folder
+            string[] files = Directory.GetDirectories(rootpath);
+            List<string> cbcompanies = new List<string>();
+            if (files.Length > 0)
+            {
+                foreach (string file in files)
                 {
-                    foreach (string file in files)
-                    {
-                        string[] ar = file.Split('\\');
-                        cbcompanies.Add(ar[ar.Length - 1]);
-                    }
+                    string[] ar = file.Split('\\');
+                    cbcompanies.Add(ar[ar.Length - 1]);
                 }
-                //else
-                //{
-                //    MessageBox.Show("You do not currently have any Folder/Files assigned to you at the moment. Please check again later.", "VDoc Entry Suite", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //}
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show("An error has occured in this program.  The IT department has been notified of this error.", "Global Report Manager", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
-            //    string pathh = @"\\chem-fs1.ers.local\Log Files\vdoc.log";
-            //    StreamWriter log;
-            //    if (File.Exists(pathh))
-            //        log = File.AppendText(pathh);
-            //    else
-            //        log = File.CreateText(pathh);
-            //    string mod = "GetFolders";
-            //    string pfile = "frmvesdataentry.cs";
-            //    string user = System.Environment.UserName;
-            //    log.WriteLine("Date: " + DateTime.Now.ToShortDateString() + "\n" + "Time: " + DateTime.Now.ToShortTimeString() + "\n" + "User: " + user + "\n" + "Error Message: " + ex.Message + "\n" + "File: " + pfile + "\n" + "Method: " + mod + "\n\n\n");
-            //    log.Close();
-            //    var smtpCreds = new NetworkCredential(@"CHEMTEL\emergency", "ERS*33602");
-            //    SmtpClient smtp = new SmtpClient("mail.chemtelinc.com", 587);
-            //    MailAddress from = new MailAddress("ers@ehs.com");
-            //    MailAddressCollection to = new MailAddressCollection();
-            //    MailMessage message = new MailMessage();
-            //    smtp.UseDefaultCredentials = false;
-            //    smtp.Credentials = smtpCreds;
-            //    string msg = "Check the log file!";
-            //    string subject = "Vdoc Error";
-            //    to.Add("mpepitone@chemtelinc.com");
-            //    message.To.Add(to.ToString());
-            //    message.From = from;
-            //    message.Subject = subject;
-            //    message.Body = msg;
-            //    smtp.Send(message);
-            //}
+            }
         }
 
         private List<string> GetLanguages()
@@ -223,6 +196,7 @@ namespace vdoc.chemtel.net.Controllers
         public JsonResult GetFiles(string SelectedCompany, int FileIndex) //Gets the selected company's files to be processed
         {
             Session.Add("CompanySelected", SelectedCompany);
+            string rootpath = @"\\chem-fs1.ers.local\Document_DB\Operators\" + Session["username"].ToString() + @"\"; //Sets the path to the operators folder
             string FileList = "";
             if (Directory.GetFiles(rootpath + "\\" + SelectedCompany).Length != 0)
             {
@@ -268,6 +242,7 @@ namespace vdoc.chemtel.net.Controllers
             try
             {
                 string reviewpath = @"\\chem-fs1.ers.local\Document_DB\Operators\Review\" + Session["CompanySelected"].ToString() + @"\"; //Sets the destination folder
+                string rootpath = @"\\chem-fs1.ers.local\Document_DB\Operators\" + Session["username"].ToString() + @"\"; //Sets the path to the operators folder
                 MSDSReview m = new MSDSReview();
                 m = GetData(fc); //Gets the data from the form
                 if (!Directory.Exists(reviewpath)) { //Determines if the current company has a subfolder in the Review folder
@@ -293,15 +268,6 @@ namespace vdoc.chemtel.net.Controllers
                 log.WriteLine("Date: " + DateTime.Now.ToShortDateString() + "\n" + "Time: " + DateTime.Now.ToShortTimeString() + "\n" + "User: " + user + "\n" + "Error Message: " + ex.Message + "\n" + "File: " + pfile + "\n" + "Method: " + mod + "\n\n\n");
                 log.Close();
                 return RedirectToAction("Error", "Home", new { ErrorMessage = ex.Message });
-
-                //string msg = "Check the log file!";
-                //string subject = "Vdoc Error";
-                //to.Add("mpepitone@chemtelinc.com");
-                //message.To.Add(to.ToString());
-                //message.From = from;
-                //message.Subject = subject;
-                //message.Body = msg;
-                //smtp.Send(message);
             }
             return RedirectToAction("Index", new {FileSubmitted = "Success" });
         }
@@ -372,7 +338,6 @@ namespace vdoc.chemtel.net.Controllers
             m.MIS = fc["CompanyMIS"].ToString();
             m.Location = fc["Location"].ToString();
             m.Department = fc["Department"].ToString();
-            m.Common_Name = fc["CommonName"].ToString();
             m.Username = Session["username"].ToString();
             m.Date_Entered = DateTime.Now;
             return m;
@@ -380,7 +345,7 @@ namespace vdoc.chemtel.net.Controllers
 
         public void AddRecord(string constring, MSDSReview m)
         {
-            string strsql = "INSERT INTO msdsreviewTest (Filename, Company, ProductName, CommonName, Manufacturer, ProductNumber, Date, MIS, Location, Dept, username, DateEntered, LastModified, Language) VALUES (@filename, @company, @productname, @commonname, @manufacturer, @productnumber, @date, @mis, @location, @dept, @username, @dateentered, @lastmodified, @language)";
+            string strsql = "INSERT INTO msdsreview (Filename, Company, ProductName, Manufacturer, ProductNumber, Date, MIS, Location, Dept, username, DateEntered, LastModified, Language) VALUES (@filename, @company, @productname, @manufacturer, @productnumber, @date, @mis, @location, @dept, @username, @dateentered, @lastmodified, @language)";
             using (SqlConnection cn = new SqlConnection(constring))
             {
                 cn.Open();
@@ -389,7 +354,6 @@ namespace vdoc.chemtel.net.Controllers
                     cmd.Parameters.AddWithValue("@filename", m.Filename);
                     cmd.Parameters.AddWithValue("@company", m.Company);
                     cmd.Parameters.AddWithValue("@productname", m.Product_Name);
-                    cmd.Parameters.AddWithValue("@commonname", m.Common_Name);
                     cmd.Parameters.AddWithValue("@manufacturer", m.Manufacturer);
                     cmd.Parameters.AddWithValue("@productnumber", m.Product_Number);
                     cmd.Parameters.AddWithValue("@date", m.Date);
