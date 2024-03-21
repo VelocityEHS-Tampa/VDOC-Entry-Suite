@@ -5,7 +5,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>\\chem-fs1.ers.local\Chemtel Websites\vdoc.chemtel.net</_PublishTargetUrl>
-    <History>True|2024-03-18T14:52:56.9816259Z;True|2024-03-18T09:46:59.4077978-04:00;True|2024-03-12T13:28:48.3159919-04:00;True|2024-03-12T13:20:42.4283243-04:00;True|2024-03-12T12:38:02.7148192-04:00;True|2024-03-12T12:12:24.8852115-04:00;True|2024-03-12T12:04:09.4723761-04:00;True|2024-03-12T12:01:51.1439491-04:00;True|2024-03-12T11:58:10.2748176-04:00;True|2024-03-12T11:57:04.1139059-04:00;True|2024-03-06T12:26:42.9935440-05:00;True|2024-03-06T12:22:58.8443132-05:00;</History>
+    <History>True|2024-03-21T12:07:27.8270901Z;True|2024-03-19T11:07:43.4868374-04:00;False|2024-03-19T10:08:43.0736880-04:00;False|2024-03-19T09:55:26.8115070-04:00;True|2024-03-18T20:33:03.5946480-04:00;True|2024-03-18T10:52:56.9816259-04:00;True|2024-03-18T09:46:59.4077978-04:00;True|2024-03-12T13:28:48.3159919-04:00;True|2024-03-12T13:20:42.4283243-04:00;True|2024-03-12T12:38:02.7148192-04:00;True|2024-03-12T12:12:24.8852115-04:00;True|2024-03-12T12:04:09.4723761-04:00;True|2024-03-12T12:01:51.1439491-04:00;True|2024-03-12T11:58:10.2748176-04:00;True|2024-03-12T11:57:04.1139059-04:00;True|2024-03-06T12:26:42.9935440-05:00;True|2024-03-06T12:22:58.8443132-05:00;</History>
   </PropertyGroup>
   <ItemGroup>
     <File Include="bin/Antlr3.Runtime.dll">
@@ -13,6 +13,9 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     </File>
     <File Include="bin/Antlr3.Runtime.pdb">
       <publishTime>09/10/2013 17:29:20</publishTime>
+    </File>
+    <File Include="bin/DuoSecurity.Auth.Http.dll">
+      <publishTime>05/01/2022 15:00:50</publishTime>
     </File>
     <File Include="bin/Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll">
       <publishTime>09/05/2018 17:10:50</publishTime>
@@ -201,10 +204,10 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>11/28/2018 13:04:24</publishTime>
     </File>
     <File Include="bin/vdoc.chemtel.net.dll">
-      <publishTime>03/18/2024 10:52:52</publishTime>
+      <publishTime>03/21/2024 08:07:21</publishTime>
     </File>
     <File Include="bin/vdoc.chemtel.net.pdb">
-      <publishTime>03/18/2024 10:52:52</publishTime>
+      <publishTime>03/21/2024 08:07:21</publishTime>
     </File>
     <File Include="bin/WebGrease.dll">
       <publishTime>01/23/2014 13:57:34</publishTime>
@@ -312,7 +315,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>03/06/2024 09:20:19</publishTime>
     </File>
     <File Include="Views/Home/Index.cshtml">
-      <publishTime>03/18/2024 10:52:44</publishTime>
+      <publishTime>03/20/2024 19:51:55</publishTime>
     </File>
     <File Include="Views/Home/Login.cshtml">
       <publishTime>03/06/2024 10:50:59</publishTime>
@@ -333,7 +336,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>10/19/2023 11:07:29</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>03/12/2024 11:58:08</publishTime>
+      <publishTime>03/21/2024 08:07:22</publishTime>
     </File>
   </ItemGroup>
 </Project>

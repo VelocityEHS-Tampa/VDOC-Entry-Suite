@@ -160,3 +160,4 @@ C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\obj\De
 C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\obj\Debug\vdoc.chemtel.net.csproj.CopyComplete
 C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\obj\Debug\vdoc.chemtel.net.dll
 C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\obj\Debug\vdoc.chemtel.net.pdb
+C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\bin\DuoSecurity.Auth.Http.dll

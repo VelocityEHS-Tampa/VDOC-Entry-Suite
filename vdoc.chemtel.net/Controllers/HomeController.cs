@@ -44,11 +44,6 @@ namespace vdoc.chemtel.net.Controllers
                 GetAcctInfo(username);
                 if (password == "Password1" || Int32.Parse(Session["DaysBetween"].ToString()) >= 90)
                 {
-                    if (username == "ctaylor") //correct users username in order to access the Operator folder.
-                    {
-                        username = "cataylor";
-                    }
-                    Session.Add("Username", username);
                     return View("ResetPassword");
                 }
                 else
@@ -250,9 +245,9 @@ namespace vdoc.chemtel.net.Controllers
                 }
                 string src = rootpath + Session["CompanySelected"].ToString() + @"\" + fc["OldFileName"].ToString(); //Sets the source path
                 string dest = reviewpath + fc["Filename"].ToString(); //Sets the destination path
+                AddRecord(constring, m);
                 System.IO.File.Copy(src, dest, true);
                 System.IO.File.Delete(src);
-                AddRecord(constring, m);
             }
             catch (Exception ex)
             {
@@ -262,9 +257,9 @@ namespace vdoc.chemtel.net.Controllers
                     log = System.IO.File.AppendText(pathh);
                 else
                     log = System.IO.File.CreateText(pathh);
-                string mod = "btnok_Click";
-                string pfile = "frmvesdataentry.cs";
-                string user = System.Environment.UserName;
+                string mod = "SubmitNewFile";
+                string pfile = "HomeController.cs";
+                string user = Session["username"].ToString();
                 log.WriteLine("Date: " + DateTime.Now.ToShortDateString() + "\n" + "Time: " + DateTime.Now.ToShortTimeString() + "\n" + "User: " + user + "\n" + "Error Message: " + ex.Message + "\n" + "File: " + pfile + "\n" + "Method: " + mod + "\n\n\n");
                 log.Close();
                 return RedirectToAction("Error", "Home", new { ErrorMessage = ex.Message });
@@ -316,12 +311,7 @@ namespace vdoc.chemtel.net.Controllers
                     FortmattedFileName += "_" + ProductNumber;
                 }
             }
-            //if (txtdate.Text != "  /  /")
-            //{
-            //    string[] ar = txtdate.Text.Split('/');
-            //    string date =ar[0]+"-"+ar[1]+"-"+ar[2];
             FortmattedFileName += "_" + Date + "_" + Language + ".pdf";
-            //}
             return Json(new { NewFileName = FortmattedFileName }, JsonRequestBehavior.AllowGet);
         }
         //Gets the data from the form
@@ -367,6 +357,11 @@ namespace vdoc.chemtel.net.Controllers
                     cmd.ExecuteNonQuery();
                 }
             }
+        }
+
+        public ActionResult Error()
+        {
+            return View();
         }
     }
 }
