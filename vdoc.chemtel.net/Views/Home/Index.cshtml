@@ -22,88 +22,91 @@ else
         <span class="alert-success form-control" style="text-align:center;">Your file has been succesfully submitted!</span>
         <br />
     }
-        <div class="col-md-5" style="width:37%;">
-            @*<h4 style="text-align:center;">Data Entry Fields</h4>*@
-            @using (Html.BeginForm("GetFiles", "Home", FormMethod.Post))
+<div class="col-md-5" style="width:37%;">
+    @*<h4 style="text-align:center;">Data Entry Fields</h4>*@
+    @using (Html.BeginForm("GetFiles", "Home", FormMethod.Post))
+    {
+        <span>Companies</span>
+        <select name="CompanySelect" id="CompanySelect" style="width:75%;" onchange="FillCompanyInfo(this.value)">
+            <option value="">--- Select Company ---</option>
+            @foreach (string c in Companies)
             {
-                <span>Companies</span>
-                <select name="CompanySelect" id="CompanySelect" style="width:75%;" onchange="FillCompanyInfo(this.value)">
-                    <option value="">--- Select Company ---</option>
-                    @foreach (string c in Companies)
-                    {
-                        if (Session["CompanySelected"] != null && Session["CompanySelected"].ToString() == c) // Allows for company to remain selected after submitting new file.
-                        {
-                            <option value="@c" selected="">@c</option>
-                        }
-                        else
-                        {
-                            <option value="@c">@c</option>
-                        }
-                    }
-                </select>
-                <br />
-                <br />
-                <input type="button" value="Go" class="form-control" style="width:50%; margin:0 auto;" onclick="GetFiles()" />
+                if (Session["CompanySelected"] != null && Session["CompanySelected"].ToString() == c) // Allows for company to remain selected after submitting new file.
+                {
+                    <option value="@c" selected="">@c</option>
+                }
+                else
+                {
+                    <option value="@c">@c</option>
+                }
             }
-            <br />
-            @using (Html.BeginForm("SubmitNewFile", "Home", FormMethod.Post, new { @id = "SubmitNewVdoc" }))
-            {
-                <input type="hidden" name="SelectedCompany" id="SelectedCompany" value="" />
-                <input type="hidden" name="OldFileName" id="OldFileName" value="" />
-                <br />
-                @*<div style="text-align:center;">
-                    <p style="text-align:left;">Priority</p>
-                    <select size="10" style="width: 75%;"></select>
-                </div>
-                <br />*@
-                @*<br />*@
-                @*<input type="button" value="Refresh" class="form-control" style="width:50%; margin:0 auto;" />*@
-                @*<br />
-                <br />*@
-                <div style="border: 5px solid #00b6de; padding: 5px; border-radius:5px;">
-                    <p>Company Information</p>
-                    <span>Company</span>&nbsp;&nbsp;<input type="text" name="CompanyName" id="CompanyName" style="width:100%; border-radius:5px;" oncopy="return false" onpaste="return false" readonly="" maxlength="600"/> <br /><br />
-                    <span>Filename</span>&nbsp;&nbsp;<input type="text" id="Filename" name="Filename" style="width: 100%; border-radius: 5px;" maxlength="256" oncopy="return false" onpaste="return false" readonly=""/><br /><br />
-                    <span>MIS</span>&nbsp;&nbsp;<input type="text" name="CompanyMIS" id="CompanyMIS" style="width: 100%; border-radius: 5px;" oncopy="return false" onpaste="return false" readonly="" maxlength="7"/><br /><br />
-                </div>
+        </select>
+        <br />
+        <br />
+        <input type="button" value="Go" class="form-control" style="width:50%; margin:0 auto;" onclick="GetFiles()" />
+    }
+    <br />
+    <span id="FilesRemaining" style="font-weight:bold;"> </span>
+    <br />
 
-                <br />
-                <br />
-
-                <div style="border: 5px solid #00b6de; padding: 5px; border-radius: 5px; ">
-                    <span>Manufacturer</span>&nbsp;&nbsp;<input type="text" id="Manufacturer" name="Manufacturer" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" autocomplete="off" maxlength="600"/><br /><br />
-                    <span>Product Name</span>&nbsp;&nbsp;<input type="text" id="ProductName" name="ProductName" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" autocomplete="off" maxlength="1000"/><br /><br />
-                    <span>Product Number</span>&nbsp;&nbsp;<input type="text" id="ProductNumber" name="ProductNumber" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" value="Unknown" autocomplete="off" maxlength="1000"/><br /><br />
-                    <span>Date</span>&nbsp;&nbsp;<input type="text" id="Date" name="Date" style="width: 100%; border-radius: 5px;" onblur="FormatDate(this.value), FormatFileName()" onpaste="return false" autocomplete="off" maxlength="10"/><br /><br />
-                    <span>Language</span>&nbsp;&nbsp;
-                    <select id="Language" name="Language" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()">
-                        <option value="">--- Select a Language ---</option>
-                        @foreach (string l in Languages)
-                        {
-                            if (l == "English")
-                            {
-                                <option value="@l" selected="">@l</option>
-                            }
-                            else
-                            {
-                                <option value="@l">@l</option>
-                            }
-                        }
-                    </select>
-                    <br /><br />
-                    <span>Location</span>&nbsp;&nbsp;<input type="text" id="Location" name="Location" style="width: 100%; border-radius: 5px;" onpaste="return false" autocomplete="off" maxlength="45"/><br /><br />
-                    <span>Department</span>&nbsp;&nbsp;<input type="text" id="Department" name="Department" style="width: 100%; border-radius: 5px;" onpaste="return false" autocomplete="off" maxlength="45"/><br /><br />
-                </div>
-
-                <br />
-                <br />
-
-                <input type="button" value="Ok" style="width:49%; display:inline;" class="form-control" onclick="return SubmitForm()" />
-                <input type="button" value="Next" style="width: 50%; display: inline;" class="form-control" onclick="GetNextFile()" />
-            }
-            <br />
-            <br />
+    @using (Html.BeginForm("SubmitNewFile", "Home", FormMethod.Post, new { @id = "SubmitNewVdoc" }))
+    {
+        <input type="hidden" name="SelectedCompany" id="SelectedCompany" value="" />
+        <input type="hidden" name="OldFileName" id="OldFileName" value="" />
+        <br />
+        @*<div style="text-align:center;">
+                <p style="text-align:left;">Priority</p>
+                <select size="10" style="width: 75%;"></select>
+            </div>
+            <br />*@
+        @*<br />*@
+        @*<input type="button" value="Refresh" class="form-control" style="width:50%; margin:0 auto;" />*@
+        @*<br />
+            <br />*@
+        <div style="border: 5px solid #00b6de; padding: 5px; border-radius:5px;">
+            <p>Company Information</p>
+            <span>Company</span>&nbsp;&nbsp;<input type="text" name="CompanyName" id="CompanyName" style="width:100%; border-radius:5px;" oncopy="return false" onpaste="return false" readonly="" maxlength="600" /> <br /><br />
+            <span>Filename</span>&nbsp;&nbsp;<input type="text" id="Filename" name="Filename" style="width: 100%; border-radius: 5px;" maxlength="256" oncopy="return false" onpaste="return false" readonly="" /><br /><br />
+            <span>MIS</span>&nbsp;&nbsp;<input type="text" name="CompanyMIS" id="CompanyMIS" style="width: 100%; border-radius: 5px;" oncopy="return false" onpaste="return false" readonly="" maxlength="7" /><br /><br />
         </div>
+
+        <br />
+        <br />
+
+        <div style="border: 5px solid #00b6de; padding: 5px; border-radius: 5px; ">
+            <span>Manufacturer</span>&nbsp;&nbsp;<input type="text" id="Manufacturer" name="Manufacturer" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" autocomplete="off" maxlength="600" /><br /><br />
+            <span>Product Name</span>&nbsp;&nbsp;<input type="text" id="ProductName" name="ProductName" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" autocomplete="off" maxlength="1000" /><br /><br />
+            <span>Product Number</span>&nbsp;&nbsp;<input type="text" id="ProductNumber" name="ProductNumber" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" value="Unknown" autocomplete="off" maxlength="1000" /><br /><br />
+            <span>Date</span>&nbsp;&nbsp;<input type="text" id="Date" name="Date" style="width: 100%; border-radius: 5px;" onblur="FormatDate(this.value), FormatFileName()" onpaste="return false" autocomplete="off" maxlength="10" /><br /><br />
+            <span>Language</span>&nbsp;&nbsp;
+            <select id="Language" name="Language" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()">
+                <option value="">--- Select a Language ---</option>
+                @foreach (string l in Languages)
+                {
+                    if (l == "English")
+                    {
+                        <option value="@l" selected="">@l</option>
+                    }
+                    else
+                    {
+                        <option value="@l">@l</option>
+                    }
+                }
+            </select>
+            <br /><br />
+            <span>Location</span>&nbsp;&nbsp;<input type="text" id="Location" name="Location" style="width: 100%; border-radius: 5px;" onpaste="return false" autocomplete="off" maxlength="45" /><br /><br />
+            <span>Department</span>&nbsp;&nbsp;<input type="text" id="Department" name="Department" style="width: 100%; border-radius: 5px;" onpaste="return false" autocomplete="off" maxlength="45" /><br /><br />
+        </div>
+
+        <br />
+        <br />
+
+        <input type="button" value="Ok" style="width:49%; display:inline;" class="form-control" onclick="return SubmitForm()" />
+        <input type="button" value="Next" style="width: 50%; display: inline;" class="form-control" onclick="GetNextFile()" />
+    }
+    <br />
+    <br />
+</div>
 
         @* Add javascript here due to IFrame stopping the loading for the regular page.  *@
         <script src="/Scripts/jquery-3.4.1.js"></script>
@@ -135,13 +138,16 @@ else
                     if (data.FileList != "" && data.FileList != null) {
                         document.getElementById("PdfDisplay").src = "https://sds.chemtel.net/DocDB/" + username + "/" + document.getElementById("CompanySelect").value + "/" + data.FileList;
                         document.getElementById("OldFileName").value = data.FileList;
+                        document.getElementById("FilesRemaining").innerHTML = "Files Remaining: " + data.FileCount;
                     } else {
                         document.getElementById("PdfDisplay").src = "";
                         alert("THERE ARE NO FILES LEFT IN THIS FOLDER, PLEASE REMOVE THE FOLDER IF IT IS COMPLETED.");
+                        document.getElementById("FilesRemaining").innerHTML = "";
                     }
                 },
                 error: function (data) {
                     alert("There is no record for the name selected. If this is OK, please disregard. If you think this is an error, please contact IT.");
+                    document.getElementById("FilesRemaining").innerHTML = "";
                 }
             });
         }
@@ -157,14 +163,18 @@ else
                     if (data.FileList != "" && data.FileList != "null") {
                         document.getElementById("PdfDisplay").src = "https://sds.chemtel.net/DocDB/" + username + "/" + document.getElementById("CompanySelect").value + "/" + data.FileList;
                         document.getElementById("OldFileName").value = data.FileList;
+                        document.getElementById("FilesRemaining").innerHTML = "Files Remaining: " + data.FileCount;
+
                     } else {
                         alert("THERE ARE NO MORE FILES LEFT IN THIS FOLDER");
                         document.getElementById("PdfDisplay").src = "";
+                        document.getElementById("FilesRemaining").innerHTML = "";
                     }
                 },
                 error: function (data) {
                     alert("There are either no records for the name selected OR you are currently on the last file in the list.");
                     document.getElementById("PdfDisplay").src = "";
+                    document.getElementById("FilesRemaining").innerHTML = "";
                 }
             });
         }

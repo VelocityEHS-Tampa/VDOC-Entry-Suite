@@ -193,16 +193,18 @@ namespace vdoc.chemtel.net.Controllers
             Session.Add("CompanySelected", SelectedCompany);
             string rootpath = @"\\chem-fs1.ers.local\Document_DB\Operators\" + Session["username"].ToString() + @"\"; //Sets the path to the operators folder
             string FileList = "";
+            string FileCount = "0";
             if (Directory.GetFiles(rootpath + "\\" + SelectedCompany).Length != 0)
             {
                 FileList = Directory.GetFiles(rootpath + "\\" + SelectedCompany)[FileIndex];
                 FileList = Path.GetFileName(FileList);
+                FileCount = Directory.GetFiles(rootpath + "\\" + SelectedCompany).Length.ToString();
             }
             else
             {
                 FileList = "";
             }
-            return Json(new { FileList = FileList }, JsonRequestBehavior.AllowGet);
+            return Json(new { FileList = FileList, FileCount = FileCount }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]

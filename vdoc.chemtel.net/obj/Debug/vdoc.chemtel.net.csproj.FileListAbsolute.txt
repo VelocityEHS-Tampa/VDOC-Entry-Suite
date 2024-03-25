@@ -130,6 +130,7 @@ C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\bin\ro
 C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\bin\roslyn\VBCSCompiler.exe
 C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\bin\roslyn\VBCSCompiler.exe.config
 C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\bin\Antlr3.Runtime.dll
+C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\bin\DuoSecurity.Auth.Http.dll
 C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
 C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\bin\Microsoft.Web.Infrastructure.dll
 C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\bin\Newtonsoft.Json.dll
@@ -160,4 +161,3 @@ C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\obj\De
 C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\obj\Debug\vdoc.chemtel.net.csproj.CopyComplete
 C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\obj\Debug\vdoc.chemtel.net.dll
 C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\obj\Debug\vdoc.chemtel.net.pdb
-C:\Users\mpepitone\Documents\GitHub Repos\VdocEntrySuite\vdoc.chemtel.net\bin\DuoSecurity.Auth.Http.dll
