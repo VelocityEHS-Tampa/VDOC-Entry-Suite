@@ -1,19 +1,12 @@
-﻿using SendGrid.Helpers.Mail;
-using SendGrid;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using vdoc.chemtel.net.Models;
-using System.Data;
-using System.Globalization;
-using System.Net;
-using System.Net.Mail;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace vdoc.chemtel.net.Controllers
 {
@@ -193,7 +186,9 @@ namespace vdoc.chemtel.net.Controllers
             Session.Add("CompanySelected", SelectedCompany);
             string rootpath = @"\\chem-fs1.ers.local\Document_DB\Operators\" + Session["username"].ToString() + @"\"; //Sets the path to the operators folder
             string FileList = "";
+            string LongFileList = "";
             string FileCount = "0";
+
             if (Directory.GetFiles(rootpath + "\\" + SelectedCompany).Length != 0)
             {
                 FileList = Directory.GetFiles(rootpath + "\\" + SelectedCompany)[FileIndex];
@@ -204,7 +199,7 @@ namespace vdoc.chemtel.net.Controllers
             {
                 FileList = "";
             }
-            return Json(new { FileList = FileList, FileCount = FileCount }, JsonRequestBehavior.AllowGet);
+            return Json(new { FileList = FileList, FileCount = FileCount, LongFileList = LongFileList }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -364,6 +359,59 @@ namespace vdoc.chemtel.net.Controllers
         public ActionResult Error()
         {
             return View();
+        }
+
+        public ActionResult BypassSDS(FormCollection fc)
+        {
+            string Rootpath = @"\\chem-fs1.ers.local\Document_DB\Operators\Bypassed SDS\" + Session["username"].ToString() + @"\";
+            string FileSource = @"\\chem-fs1.ers.local\Document_DB\Operators\" + Session["username"].ToString() + @"\" + fc["BPCompanyName"].ToString() + @"\" + fc["BPFileName"].ToString();
+            string DestinationPath = @"\\chem-fs1.ers.local\Document_DB\Operators\Bypassed SDS\" + Session["username"].ToString() + @"\" + fc["BPCompanyName"].ToString() + @"\";
+            int BypassCounter = Int32.Parse(fc["BypassCount"]);
+            BypassCounter = BypassCounter + 1; 
+
+            if (!Directory.Exists(Rootpath)) //If the user does not have a directory yet, create it.
+            {
+                Directory.CreateDirectory(Rootpath);
+            }
+            if (!Directory.Exists(DestinationPath)) //If the user does not have a the company directory yet, create it.
+            {
+                Directory.CreateDirectory(DestinationPath);
+            }
+            //If the reason for bypass is NOT Other, move the file to the bypass folder.
+            if (fc["BypassSDSReason"].ToString() != "Other")
+            {
+                try
+                {
+                    System.IO.File.Copy(FileSource, DestinationPath + fc["BPFileName"].ToString(), true);
+                    System.IO.File.Delete(FileSource);
+                } catch (IOException)
+                {
+                    return RedirectToAction("Index", new {Error = "There may be security protocols with the document attempted to bypass, please reach out to admin to remove the file."});
+                }
+            }
+
+            var client = new SendGrid.SendGridClient("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");
+            var from = new EmailAddress("ers@ehs.com");
+            string subject = "vDoc Bypassed File";
+            string body = Session["FullName"].ToString() + " has bypassed a file: <br /><br />" +
+                "<b>File Name:</b> " + fc["BPFileName"].ToString() + "<br /><br />" +
+                "<b>Company Name:</b> " + fc["BPCompanyName"].ToString() + "<br /><br />";
+                if (fc["BypassSDSReason"].ToString() == "Other")
+                {
+                    body += "<b>Reason:</b> " + fc["BypassSDSReason"].ToString() + "<br />" +
+                    "<b>Other Details:</b> " + fc["OtherReasonTxt"].ToString();
+                } else
+                {
+                    body += "<b>Reason:</b> " + fc["BypassSDSReason"].ToString();
+                }
+            List<EmailAddress> to = new List<EmailAddress>();
+            to.Add(new EmailAddress("mpepitone@ehs.com"));
+            to.Add(new EmailAddress("tbrown@ehs.com"));
+            to.Add(new EmailAddress("dabdon@ehs.com"));
+            var msg = MailHelper.CreateSingleEmailToMultipleRecipients(from, to, subject, "", body, true);
+            client.SendEmailAsync(msg);
+
+            return RedirectToAction("Index", new {Bypassed = BypassCounter });
         }
     }
 }
