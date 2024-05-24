@@ -261,7 +261,7 @@ namespace vdoc.chemtel.net.Controllers
                 log.Close();
                 return RedirectToAction("Error", "Home", new { ErrorMessage = ex.Message });
             }
-            return RedirectToAction("Index", new {FileSubmitted = "Success" });
+            return RedirectToAction("Index", new {FileSubmitted = "Success", Bypassed = fc["BypassCount2"].ToString() });
         }
         [HttpGet]
         public JsonResult FormatFilename(string Manufacturer, string ProductName, string ProductNumber, string Language, string Date)
@@ -292,7 +292,6 @@ namespace vdoc.chemtel.net.Controllers
             {
                 if (ProductNumber.Contains(' '))
                 {
-
                     string[] ar = ProductNumber.Split();
                     if (ar.Length > 1)
                     {
@@ -367,6 +366,7 @@ namespace vdoc.chemtel.net.Controllers
             string FileSource = @"\\chem-fs1.ers.local\Document_DB\Operators\" + Session["username"].ToString() + @"\" + fc["BPCompanyName"].ToString() + @"\" + fc["BPFileName"].ToString();
             string DestinationPath = @"\\chem-fs1.ers.local\Document_DB\Operators\Bypassed SDS\" + Session["username"].ToString() + @"\" + fc["BPCompanyName"].ToString() + @"\";
             int BypassCounter = Int32.Parse(fc["BypassCount"]);
+            int AlreadyBypassed = CheckDuplicateBypass(Session["username"].ToString(), fc["BPFileName"].ToString());
             BypassCounter = BypassCounter + 1; 
 
             if (!Directory.Exists(Rootpath)) //If the user does not have a directory yet, create it.
@@ -390,28 +390,72 @@ namespace vdoc.chemtel.net.Controllers
                 }
             }
 
-            var client = new SendGrid.SendGridClient("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");
-            var from = new EmailAddress("ers@ehs.com");
-            string subject = "vDoc Bypassed File";
-            string body = Session["FullName"].ToString() + " has bypassed a file: <br /><br />" +
-                "<b>File Name:</b> " + fc["BPFileName"].ToString() + "<br /><br />" +
-                "<b>Company Name:</b> " + fc["BPCompanyName"].ToString() + "<br /><br />";
+            if (AlreadyBypassed == 0) //If record count for this bypassed SDS is greater than 0, don't insert again.
+            {
+                var client = new SendGrid.SendGridClient("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");
+                var from = new EmailAddress("ers@ehs.com");
+                string subject = "vDoc Bypassed File";
+                string body = Session["FullName"].ToString() + " has bypassed a file: <br /><br />" +
+                    "<b>File Name:</b> " + fc["BPFileName"].ToString() + "<br /><br />" +
+                    "<b>Company Name:</b> " + fc["BPCompanyName"].ToString() + "<br /><br />";
+                    if (fc["BypassSDSReason"].ToString() == "Other")
+                    {
+                        body += "<b>Reason:</b> " + fc["BypassSDSReason"].ToString() + "<br />" +
+                        "<b>Other Details:</b> " + fc["OtherReasonTxt"].ToString();
+                    } else
+                    {
+                        body += "<b>Reason:</b> " + fc["BypassSDSReason"].ToString();
+                    }
+                List<EmailAddress> to = new List<EmailAddress>();
+                to.Add(new EmailAddress("mpepitone@ehs.com"));
+                to.Add(new EmailAddress("tbrown@ehs.com"));
+                to.Add(new EmailAddress("dabdon@ehs.com"));
+                var msg = MailHelper.CreateSingleEmailToMultipleRecipients(from, to, subject, "", body, true);
+                client.SendEmailAsync(msg);
+
+                string ByPassReason = "";
                 if (fc["BypassSDSReason"].ToString() == "Other")
                 {
-                    body += "<b>Reason:</b> " + fc["BypassSDSReason"].ToString() + "<br />" +
-                    "<b>Other Details:</b> " + fc["OtherReasonTxt"].ToString();
-                } else
-                {
-                    body += "<b>Reason:</b> " + fc["BypassSDSReason"].ToString();
+                    ByPassReason = fc["BypassSDSReason"].ToString() + " - " + fc["OtherReasonTxt"].ToString();
                 }
-            List<EmailAddress> to = new List<EmailAddress>();
-            to.Add(new EmailAddress("mpepitone@ehs.com"));
-            to.Add(new EmailAddress("tbrown@ehs.com"));
-            to.Add(new EmailAddress("dabdon@ehs.com"));
-            var msg = MailHelper.CreateSingleEmailToMultipleRecipients(from, to, subject, "", body, true);
-            client.SendEmailAsync(msg);
+                else
+                {
+                    ByPassReason = fc["BypassSDSReason"].ToString();
+                }
+                string sql = "INSERT INTO BypassedSDS (Username, FileName, BypassReason, BypassDate) VALUES (@username, @filename, @reason, @date)";
 
+                using (SqlConnection con = new SqlConnection(constring))
+                {
+                    using (SqlCommand cmd = new SqlCommand(sql, con))
+                    {
+                        con.Open();
+                        cmd.Parameters.AddWithValue("@username", Session["username"].ToString());
+                        cmd.Parameters.AddWithValue("@filename", fc["BPFileName"].ToString());
+                        cmd.Parameters.AddWithValue("@reason", ByPassReason);
+                        cmd.Parameters.AddWithValue("@date", DateTime.Now.ToString("yyyy-MM-dd"));
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
             return RedirectToAction("Index", new {Bypassed = BypassCounter });
+        }
+
+        private int CheckDuplicateBypass(string user, string filename)
+        {
+            int AlreadyBypassed = 0;
+            string sql = "SELECT COUNT(*) FROM BypassedSDS WHERE Username = @user AND FileName = @File";
+
+            using (SqlConnection conn = new SqlConnection(constring))
+            {
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    conn.Open();
+                    cmd.Parameters.AddWithValue("@user", user);
+                    cmd.Parameters.AddWithValue("@File", filename);
+                    AlreadyBypassed = Int32.Parse(cmd.ExecuteScalar().ToString()); //Set INT variable to record count
+                }
+            }
+            return AlreadyBypassed;
         }
     }
 }

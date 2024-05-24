@@ -6,6 +6,7 @@
     Languages = ViewBag.Languages;
     string RepeatCompany = "";
     int Bypassed = 0;
+
     if (Request.QueryString["Bypassed"] != null)
     {
         Bypassed = Int32.Parse(Request.QueryString["Bypassed"].ToString());
@@ -46,13 +47,14 @@ else
                 <div class="BypassForm" id="BypassForm">
                     <input type="radio" name="BypassSDSReason" id="NotanSDS" value="Not an SDS" /> Not an SDS <br />
                     <input type="radio" name="BypassSDSReason" id="NoManufacturer" value="No Manufacturer" /> No Manufacturer <br />
-                    <input type="radio" name="BypassSDSReason" id="NoSDSVisible" value="No SDS Visible" /> No SDS Visible <br />
+                    <input type="radio" name="BypassSDSReason" id="NoSDSVisible" value="No SDS Visible / 404 Error" /> No SDS Visible / 404 Error <br />
                     <input type="radio" name="BypassSDSReason" id="Unreadable" value="Unreadable" /> Unreadable <br />
                     <input type="radio" name="BypassSDSReason" id="SeparateFiles" value="Separate Files" /> Separate Files <br />
+                    <input type="radio" name="BypassSDSReason" id="Duplicate" value="Duplicate File" /> Duplicate File <br />
                     @* This is the only time it will be moved. *@
                     <input type="radio" name="BypassSDSReason" id="OtherReason" value="Other" /> Other (must include a reason) <br />
                     <textarea name="OtherReasonTxt" id="OtherReasonTxt"></textarea><br /><br />
-                    <input type="submit" value="Submit" id="BypassSubmit" onclick="return SubmitByPassForm()"/>
+                    <input type="submit" value="Submit" id="BypassSubmit" onclick="return SubmitByPassForm()" />
                 </div>
             }
         </div>
@@ -88,6 +90,7 @@ else
 
         @using (Html.BeginForm("SubmitNewFile", "Home", FormMethod.Post, new { @id = "SubmitNewVdoc" }))
         {
+            <input type="hidden" name="BypassCount2" id="BypassCount2" value="0" />
             <input type="hidden" name="SelectedCompany" id="SelectedCompany" value="" />
             <input type="hidden" name="OldFileName" id="OldFileName" value="" />
             <br />
@@ -100,9 +103,9 @@ else
             <br />
             <br />
             <div style="border: 5px solid #00b6de; padding: 5px; border-radius: 5px; ">
-                <span>Manufacturer</span>&nbsp;&nbsp;<input type="text" id="Manufacturer" name="Manufacturer" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" autocomplete="off" maxlength="600" /><br /><br />
-                <span>Product Name</span><br /><textarea id="ProductName" name="ProductName" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" autocomplete="off" maxlength="1000"></textarea><br /><br />
-                <span>Product Number</span>&nbsp;&nbsp;<textarea id="ProductNumber" name="ProductNumber" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" autocomplete="off" maxlength="1000">Unknown</textarea><br /><br />
+                <span>Manufacturer</span>&nbsp;&nbsp;<input type="text" id="Manufacturer" name="Manufacturer" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" autocomplete="off" /><br /><br />
+                <span>Product Name</span><br /><textarea id="ProductName" name="ProductName" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" autocomplete="off"></textarea><br /><br />
+                <span>Product Number</span>&nbsp;&nbsp;<textarea id="ProductNumber" name="ProductNumber" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()" onpaste="return false" autocomplete="off">Unknown</textarea><br /><br />
                 <span>Date</span>&nbsp;&nbsp;<input type="text" id="Date" name="Date" style="width: 100%; border-radius: 5px;" onblur="FormatDate(this.value), FormatFileName()" onpaste="return false" autocomplete="off" maxlength="10" /><br /><br />
                 <span>Language</span>&nbsp;&nbsp;
                 <select id="Language" name="Language" style="width: 100%; border-radius: 5px;" onblur="FormatFileName()">
@@ -146,7 +149,7 @@ else
                 if (@Bypassed != 0) {
                     GetNextFile(@Bypassed);
                 } else {
-                    GetFiles(); //Gets the next file of the still selected company
+                    GetFiles(); //Gets the next file of the still selected company at the same file location
                 }
             }
         });
@@ -194,7 +197,7 @@ else
             var username = "@Session["Username"].ToString()";
             $.ajax({
                 url: '/Home/GetFiles/',
-                data: { SelectedCompany: document.getElementById("CompanySelect").value, FileIndex:0 },
+                data: { SelectedCompany: document.getElementById("CompanySelect").value, FileIndex: 0 },
                 type: 'GET',
                 success: function (data) {
                     //var CompanyFiles = data.split(',');
@@ -299,6 +302,8 @@ else
                 type: 'GET',
                 success: function (data) {
                     document.getElementById("Filename").value = data.NewFileName;
+                    FilePath += data.NewFileName;
+
                 },
                 error: function (data) {
                     alert("There was an error while formatting the new file name.");
@@ -311,7 +316,7 @@ else
                 data: { Filename: document.getElementById("Filename").value, CompanySelected: document.getElementById("SelectedCompany").value },
                 type: 'GET',
                 success: function (data) {
-                    HasDuplicateMessage(data.HasDuplicate);
+                    HasDuplicateMessage(data.HasDuplicate, document.getElementById("Filename").value);
                 },
                 error: function (data) {
                     alert("ERROR!");
@@ -319,16 +324,28 @@ else
             });
 
         }
-        function HasDuplicateMessage(DuplicateBit) {
+        function HasDuplicateMessage(DuplicateBit, FileName) {
             if (DuplicateBit == "1") {
                 var submit = confirm("There is another with the same file name, do you want to overwrite the existing file?");
                 if (submit) { //If overwrite is good to go push to review.
-                    document.getElementById("SubmitNewVdoc").submit();
+                    var FilePath = "\\chem-fs1.ers.local\\Document_DB\\Operators\\Review\\" + document.getElementById("CompanySelect").value + "\\" + FileName;
+                    if (FilePath.length > 256) {
+                        alert("Your new file name is too long and must be shortened, please add a comma in the product name if necessary.");
+                        return false;
+                    } else {
+                        document.getElementById("SubmitNewVdoc").submit();
+                    }
                 } else {
                     return false;
                 }
             } else {
-                document.getElementById("SubmitNewVdoc").submit();
+                var FilePath = "\\chem-fs1.ers.local\\Document_DB\\Operators\\Review\\" + document.getElementById("CompanySelect").value + "\\" + FileName;
+                if (FilePath.length > 256) {
+                    alert("Your new file name is too long and must be shortened, please add a comma in the product name if necessary.");
+                    return false;
+                } else {
+                    document.getElementById("SubmitNewVdoc").submit();
+                }
             }
         }
     </script>

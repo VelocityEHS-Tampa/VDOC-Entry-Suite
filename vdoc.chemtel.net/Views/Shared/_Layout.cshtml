@@ -15,16 +15,31 @@
                     "@Html.ActionLink("VDOC Entry Suite", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
                     <img src="~/Content/computer.ico" style="height:30px; width:30px; margin-top:10px;" />
                 </div>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        @if (Session["Username"] != null && Session["AccountType"] != null && Session["FullName"] != null && Session["Username"].ToString() != "" && Session["AccountType"].ToString() != "" && Session["FullName"].ToString() != "")
+                        {
+                            <li>
+                                <a href="#" onclick="AreYouSure()">Logout</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
             </div>
         </div>
         <div class="body-content">
             @RenderBody()
             <hr />
         </div>
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2001-2023 VelocityEHS. All rights reserved. VelocityEHS® and VelocityEHS Accelerate® are proprietary trademarks of VelocityEHS. All other trademarks are the property of the respective owners.
+            </div>
+        </footer>
 
-        @Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/bootstrap")
-        @RenderSection("scripts", required: false)
+        <script src="~/scripts/jquery.min.js"></script>
+        <script src="~/scripts/bootstrap.min.js"></script>
+        <script src="~/scripts/site.js" asp-append-version="true"></script>
     </body>
 </html>
 
