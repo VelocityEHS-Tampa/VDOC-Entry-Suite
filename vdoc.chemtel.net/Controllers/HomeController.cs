@@ -7,11 +7,19 @@ using System.Web.Mvc;
 using vdoc.chemtel.net.Models;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using System.Web;
+using DuoUniversal;
 
 namespace vdoc.chemtel.net.Controllers
 {
     public class HomeController : Controller
     {
+        string ClientId = ""; //Setting from Duo
+        //NEW OIDC SECRET 1Fa73J1WgMbccHoBWTpR8ijwnfznDLjgTX8rGP4P
+        //OLD SECRET IOTgcps6k2qvJtQzz0I07QXNLrhjev34dDP9XhZl
+        string ClientSecret = ""; //Setting from Duo
+        string ApiHost = ""; //Setting from Duo
+        string RedirectUri = ""; //This is the URL you will redirect to after authentication. It does not need to be publically accessible.
         string constring = Properties.Settings.Default.Connection; //Connection string to the database
         string Userconstring = Properties.Settings.Default.UserConnection; //Connection string to the database
 
@@ -35,13 +43,23 @@ namespace vdoc.chemtel.net.Controllers
             {
                 Session.Add("SessionStartTime", DateTime.Now);
                 GetAcctInfo(username);
+
+                //Add Cookie for longer session time
+                HttpCookie UserCookie = new HttpCookie("UserCookie");
+                UserCookie.Value = username;
+                UserCookie.Expires = DateTime.Now.AddHours(2);
+                
                 if (password == "Password1" || Int32.Parse(Session["DaysBetween"].ToString()) >= 90)
                 {
+                    RedirectUri = "https://vdoc.chemtel.net/Home/ResetPassword";
+                    InitiateDuo(username); //User should be the username trying to login.
                     return View("ResetPassword");
                 }
                 else
                 {
                     ViewBag.ErrorMessage = "Successful Login!";
+                    RedirectUri = "https://vdoc.chemtel.net/Home/Index";
+                    InitiateDuo(username); //User should be the username trying to login.
                     return RedirectToAction("Index");
                 }
             }
@@ -50,6 +68,30 @@ namespace vdoc.chemtel.net.Controllers
                 ViewBag.ErrorMessage = "Invalid Username/Password combination";
                 return View();
             }
+        }
+        public void InitiateDuo(string User)
+        {
+            //Create client using config settings
+            Client duoClient = new ClientBuilder(ClientId, ClientSecret, ApiHost, RedirectUri).Build();
+            Session["client"] = duoClient;
+
+            // Check if Duo seems to be healthy and able to service authentications.
+            // If Duo were unhealthy, you could possibly send user to an error page, or implement a fail mode
+            var isDuoHealthy = duoClient.DoHealthCheck();
+
+            // Generate a random state value to tie the authentication steps together
+            string state = Client.GenerateState();
+            // Save the state and username in the session for later
+            Session["STATE_SESSION_KEY"] = state;
+            Session["USERNAME_SESSION_KEY"] = User;
+
+            // Get the URI of the Duo prompt from the client.  This includes an embedded authentication request.
+            string promptUri = duoClient.GenerateAuthUri(User, state);
+
+            // Redirect the user's browser to the Duo prompt.
+            // The Duo prompt, after authentication, will redirect back to the configured Redirect URI to complete the authentication flow.
+            // In this example, that is /duo_callback, which is implemented in Callback.cshtml.cs.
+            Response.Redirect(promptUri, false);
         }
         public ActionResult ResetPassword()
         {
@@ -137,6 +179,15 @@ namespace vdoc.chemtel.net.Controllers
 
         public ActionResult Index()
         {
+            Session.Add("constring", "");
+            if (Request.Url.AbsoluteUri.Contains("localhost"))
+            {
+                RedirectUri = "https://localhost:44383";
+            }
+            else
+            {
+                RedirectUri = "https://vdoc.chemtel.net";
+            }
             if (Session["Username"] == null || Session["Username"].ToString() == "")
             {
             } else

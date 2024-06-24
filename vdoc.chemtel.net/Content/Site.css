@@ -75,3 +75,35 @@
     width: 50%;
     margin: 0 auto;
 }
+
+.NavMenu {
+    list-style-type: none;
+    position: absolute;
+    background-color: white;
+    display: none;
+    background-color: #4c5559;
+    color: black;
+    font-weight: 600;
+    margin: 0;
+    padding: 2px;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+
+.NavMenu > li > a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+a.navbar-brand {
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
+}
