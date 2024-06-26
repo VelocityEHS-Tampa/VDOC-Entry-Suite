@@ -28,7 +28,8 @@ else
         <span class="alert-success form-control" style="text-align:center;">Your file has been succesfully submitted!</span>
         <br />
     }
-    if (Request.QueryString["Error"] != null) { 
+    if (Request.QueryString["Error"] != null)
+    {
         <span class="alert-danger form-control" style="text-align:center;">@Request.QueryString["Error"].ToString()</span>
         <br />
     }
@@ -136,9 +137,8 @@ else
         <br />
         <br />
     </div>
-
     @* Add javascript here due to IFrame stopping the loading for the regular page.  *@
-    <script src="/Scripts/jquery-3.4.1.js"></script>
+    <script src="/Scripts/jquery-3.7.1.js"></script>
     <script>
         $(document).ready(function () {
             document.getElementById("BypassCount").value = @Bypassed;
@@ -346,6 +346,11 @@ else
                 } else {
                     document.getElementById("SubmitNewVdoc").submit();
                 }
+            }
+        }
+        function AreYouSure() {
+            if (confirm("Are you sure you want to log out?")) {
+                location.href = "@Url.Action("Logout", "Home")";
             }
         }
     </script>

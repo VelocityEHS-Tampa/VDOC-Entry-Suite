@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="vdoc.chemtel.net.Properties.Settings.Connection-Web.config Connection String" description="vdoc.chemtel.net.Properties.Settings.Connection Connection String used in web.config by the application to access the database." defaultValue="Data Source=chemdb1.c8ujbgtllu2u.us-east-2.rds.amazonaws.com;Initial Catalog=vdocs;Persist Security Info=True;User ID=admin;Password=LrtcXcIvlnNlWNDDeArq" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\mpepitone\\Documents\\GitHub\ Repos\\VdocEntrySuite\\vdoc\.chemtel\.net\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='vdoc.chemtel.net.Properties.Settings.Connection']/@connectionString" />
+  </parameter>
+  <parameter name="vdoc.chemtel.net.Properties.Settings.UserConnection-Web.config Connection String" description="vdoc.chemtel.net.Properties.Settings.UserConnection Connection String used in web.config by the application to access the database." defaultValue="Data Source=chemdb1.c8ujbgtllu2u.us-east-2.rds.amazonaws.com;Initial Catalog=chemreporter;Persist Security Info=True;User ID=admin;Password=LrtcXcIvlnNlWNDDeArq" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\mpepitone\\Documents\\GitHub\ Repos\\VdocEntrySuite\\vdoc\.chemtel\.net\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='vdoc.chemtel.net.Properties.Settings.UserConnection']/@connectionString" />
+  </parameter>
+</parameters>

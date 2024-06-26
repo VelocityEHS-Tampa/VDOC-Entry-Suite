@@ -14,11 +14,9 @@ namespace vdoc.chemtel.net.Controllers
 {
     public class HomeController : Controller
     {
-        string ClientId = ""; //Setting from Duo
-        //NEW OIDC SECRET 1Fa73J1WgMbccHoBWTpR8ijwnfznDLjgTX8rGP4P
-        //OLD SECRET IOTgcps6k2qvJtQzz0I07QXNLrhjev34dDP9XhZl
-        string ClientSecret = ""; //Setting from Duo
-        string ApiHost = ""; //Setting from Duo
+        string ClientId = "DIRYDPC1U9P2KT8N8ZJ8"; //Setting from Duo
+        string ClientSecret = "UfkD1EkeFiNlFctK30YhD4tVYHpSIpN0IbhJG5R3"; //Setting from Duo
+        string ApiHost = "api-64691b0c.duosecurity.com"; //Setting from Duo
         string RedirectUri = ""; //This is the URL you will redirect to after authentication. It does not need to be publically accessible.
         string constring = Properties.Settings.Default.Connection; //Connection string to the database
         string Userconstring = Properties.Settings.Default.UserConnection; //Connection string to the database
@@ -32,7 +30,7 @@ namespace vdoc.chemtel.net.Controllers
             //Throw error if missing field.
             if (username == "" || password == "")
             {
-                ViewBag.ErrorMessage = "Invalid Username/Password combination";
+                ViewBag.ErrorMessage = "You must enter in a Username AND Password";
                 return View();
             }
 
@@ -42,13 +40,14 @@ namespace vdoc.chemtel.net.Controllers
             if (LoginValidated == "Yes")
             {
                 Session.Add("SessionStartTime", DateTime.Now);
-                GetAcctInfo(username);
+                Session.Add("Username", username);
 
-                //Add Cookie for longer session time
+                ////Add Cookie for longer session time
                 HttpCookie UserCookie = new HttpCookie("UserCookie");
                 UserCookie.Value = username;
                 UserCookie.Expires = DateTime.Now.AddHours(2);
-                
+
+                GetAcctInfo(username);
                 if (password == "Password1" || Int32.Parse(Session["DaysBetween"].ToString()) >= 90)
                 {
                     RedirectUri = "https://vdoc.chemtel.net/Home/ResetPassword";
@@ -60,7 +59,7 @@ namespace vdoc.chemtel.net.Controllers
                     ViewBag.ErrorMessage = "Successful Login!";
                     RedirectUri = "https://vdoc.chemtel.net/Home/Index";
                     InitiateDuo(username); //User should be the username trying to login.
-                    return RedirectToAction("Index");
+                    return View("Contact");
                 }
             }
             else
@@ -148,7 +147,6 @@ namespace vdoc.chemtel.net.Controllers
             {
                 Validated = "Yes";
             }
-
             return Validated;
         }
         private void GetAcctInfo(string username)
@@ -179,18 +177,10 @@ namespace vdoc.chemtel.net.Controllers
 
         public ActionResult Index()
         {
-            Session.Add("constring", "");
-            if (Request.Url.AbsoluteUri.Contains("localhost"))
-            {
-                RedirectUri = "https://localhost:44383";
-            }
-            else
-            {
-                RedirectUri = "https://vdoc.chemtel.net";
-            }
             if (Session["Username"] == null || Session["Username"].ToString() == "")
             {
-            } else
+            }
+            else
             {
                 //Get Companies within Users folder
                 string rootpath = @"\\chem-fs1.ers.local\Document_DB\Operators\" + Session["username"].ToString() + @"\"; //Sets the path to the operators folder
